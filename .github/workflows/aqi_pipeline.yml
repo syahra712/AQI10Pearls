@@ -2,15 +2,18 @@ name: AQI Prediction Automation
 
 on:
   schedule:
-    - cron: "0 * * * *"        # Every hour → fetch and append new AQI data
-    - cron: "30 0 * * *"       # Every day at 00:30 UTC → retrain the model
-  workflow_dispatch:            # Manual trigger
+    - cron: "0 * * * *"        # ⏰ Every hour — fetch and push new AQI data
+    - cron: "30 0 * * *"       # 🌙 Every day at 00:30 UTC — retrain model on full 6-month dataset
+  workflow_dispatch:            # 🧭 Manual trigger support (from GitHub Actions tab)
 
 env:
   PYTHONPATH: .
   HOPSWORKS_HOST: c.app.hopsworks.ai
 
 jobs:
+  # =====================================================
+  #  1️⃣ HOURLY FEATURE UPDATE JOB
+  # =====================================================
   hourly-fetch:
     name: Hourly Feature Update
     runs-on: ubuntu-latest
@@ -28,7 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🌫 Fetch and Push New AQI Data
+      - name: 🌫 Run Hourly Data Fetch + Append to Hopsworks
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
@@ -36,6 +39,9 @@ jobs:
         run: |
           python3 hithere.py --mode fetch --hours 24
 
+  # =====================================================
+  #  2️⃣ DAILY MODEL RETRAINING JOB
+  # =====================================================
   daily-train:
     name: Daily Model Retraining
     runs-on: ubuntu-latest
@@ -62,6 +68,9 @@ jobs:
         run: |
           python3 hithere.py --mode train
 
+  # =====================================================
+  #  3️⃣ OPTIONAL: MANUAL DASHBOARD LAUNCH (Preview)
+  # =====================================================
   dashboard-preview:
     if: github.event_name == 'workflow_dispatch'
     name: Manual Dashboard Preview (Optional)
