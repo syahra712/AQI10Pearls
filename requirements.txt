@@ -5,3 +5,11 @@ scikit-learn
 streamlit
 joblib
 numpy
+pandas
+numpy
+scikit-learn
+statsmodels
+tensorflow==2.16.2
+shap
+requests
+joblib
