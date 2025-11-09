@@ -30,6 +30,7 @@ logger = logging.getLogger("aqi")
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
 HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "aqipredictionn")
 FEATURE_GROUP_NAME = "aqi_features"
+HOPSWORKS_HOST = os.getenv("HOPSWORKS_HOST", "c.app.hopsworks.ai")
 FEATURE_GROUP_VERSION = 1
 MODEL_DIR = "./model"
 CSV_PATH = "features_latest.csv"
