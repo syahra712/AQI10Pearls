@@ -1,0 +1,32 @@
+name: AQI Prediction Automation
+
+on:
+  schedule:
+    - cron: "0 * * * *"     # Every hour: Feature pipeline
+    - cron: "0 0 * * *"     # Every day at midnight: Training pipeline
+  workflow_dispatch:         # Allow manual runs
+
+jobs:
+  run-feature-and-train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run AQI pipeline
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: |
+          echo "Running full AQI Prediction pipeline..."
+          python aqi_pipeline.py

@@ -1,0 +1,7 @@
+pandas
+requests
+hopsworks==4.2.*
+scikit-learn
+streamlit
+joblib
+numpy
