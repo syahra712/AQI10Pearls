@@ -2,18 +2,15 @@ name: AQI Prediction Automation
 
 on:
   schedule:
-    - cron: "0 * * * *"        # ⏰ Every hour — fetch and push new AQI data
-    - cron: "30 0 * * *"       # 🌙 Every day at 00:30 UTC — retrain model on full 6-month dataset
-  workflow_dispatch:            # 🧭 Manual trigger support (from GitHub Actions tab)
+    - cron: "0 * * * *"        # Every hour → fetch and append new AQI data
+    - cron: "30 0 * * *"       # Every day at 00:30 UTC → retrain the model
+  workflow_dispatch:            # Manual trigger
 
 env:
   PYTHONPATH: .
   HOPSWORKS_HOST: c.app.hopsworks.ai
 
 jobs:
-  # =====================================================
-  #  1️⃣ HOURLY FEATURE UPDATE JOB
-  # =====================================================
   hourly-fetch:
     name: Hourly Feature Update
     runs-on: ubuntu-latest
@@ -31,18 +28,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🌫 Run Hourly Data Fetch + Append to Hopsworks
+      - name: 🌫 Fetch and Push New AQI Data
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
         run: |
-          cd 10Pearls
           python3 hithere.py --mode fetch --hours 24
 
-  # =====================================================
-  #  2️⃣ DAILY MODEL RETRAINING JOB
-  # =====================================================
   daily-train:
     name: Daily Model Retraining
     runs-on: ubuntu-latest
@@ -67,12 +60,8 @@ jobs:
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
         run: |
-          cd 10Pearls
           python3 hithere.py --mode train
 
-  # =====================================================
-  #  3️⃣ OPTIONAL: MANUAL DASHBOARD LAUNCH (Preview)
-  # =====================================================
   dashboard-preview:
     if: github.event_name == 'workflow_dispatch'
     name: Manual Dashboard Preview (Optional)
@@ -97,7 +86,6 @@ jobs:
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
           HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
         run: |
-          cd 10Pearls
           nohup streamlit run hithere.py -- --mode dashboard &
           sleep 60
           echo "✅ Dashboard preview launched for 1 minute"
