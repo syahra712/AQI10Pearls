@@ -151,7 +151,7 @@ def create_feature_group(df, feature_group_name=FEATURE_GROUP_NAME):
     df["aqi_change_rate"] = df["aqi_estimated"].diff().fillna(0)
 
     logger.info("Logging into Hopsworks...")
-    project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT)
+    project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
     fs = project.get_feature_store()
 
     fg = fs.get_or_create_feature_group(
@@ -171,7 +171,7 @@ def create_feature_group(df, feature_group_name=FEATURE_GROUP_NAME):
 # ============================================================
 def wait_for_materialization(job_name="aqi_features_1_offline_fg_materialization", timeout=300):
     try:
-        project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT)
+        project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
         job = project.get_jobs().get_job(job_name)
         if job:
             logger.info("Waiting for materialization job %s...", job_name)
@@ -187,7 +187,7 @@ def train_and_register_model(df):
         raise ValueError("Empty dataframe passed to training.")
 
     wait_for_materialization()
-    project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY, project=HOPSWORKS_PROJECT)
+    project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
     mr = project.get_model_registry()
     df = df.dropna()
 
