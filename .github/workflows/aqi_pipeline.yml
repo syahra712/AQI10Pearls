@@ -29,4 +29,4 @@ jobs:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
         run: |
           echo "Running full AQI Prediction pipeline..."
-          python aqi_pipeline.py
+          python hithere.py
