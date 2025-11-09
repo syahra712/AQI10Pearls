@@ -34,7 +34,7 @@ jobs:
       - name: 🌫️ Run Hourly Data Fetch + Append to Hopsworks
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-          HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
+          HOPSWORKS_PROJECT: aqipredictionn
           HOPSWORKS_HOST: c.app.hopsworks.ai
         run: |
           python3 hithere.py --mode fetch --hours 24
