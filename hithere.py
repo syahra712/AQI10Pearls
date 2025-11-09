@@ -29,8 +29,8 @@ logger = logging.getLogger("aqi")
 # ---------- CONFIG ----------
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
 HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "aqipredictionn")
+HOPSWORKS_HOST = os.getenv("HOPSWORKS_HOST", "c.app.hopsworks.ai")  # ✅ ADD DEFAULT HOST
 FEATURE_GROUP_NAME = "aqi_features"
-HOPSWORKS_HOST = os.getenv("HOPSWORKS_HOST", "c.app.hopsworks.ai")
 FEATURE_GROUP_VERSION = 1
 MODEL_DIR = "./model"
 CSV_PATH = "features_latest.csv"
@@ -50,7 +50,7 @@ def make_session(total_retries=5, backoff=1.0):
 
 
 # ============================================================
-#  STEP 1 — FETCH WEATHER & POLLUTANT DATA
+#  STEP 1 – FETCH WEATHER & POLLUTANT DATA
 # ============================================================
 def fetch_monthly_data(latitude, longitude, start_date, end_date, session=None):
     """Fetch weather + air quality hourly data for the given date range using Open-Meteo archive APIs."""
@@ -135,7 +135,7 @@ def fetch_range_data(latitude, longitude, days=180):
 
 
 # ============================================================
-#  STEP 2 — COMPUTE FEATURES & STORE IN HOPSWORKS
+#  STEP 2 – COMPUTE FEATURES & STORE IN HOPSWORKS
 # ============================================================
 def create_feature_group(df, feature_group_name=FEATURE_GROUP_NAME):
     """Compute derived features and push to Hopsworks Feature Store."""
@@ -152,7 +152,12 @@ def create_feature_group(df, feature_group_name=FEATURE_GROUP_NAME):
     df["aqi_change_rate"] = df["aqi_estimated"].diff().fillna(0)
 
     logger.info("Logging into Hopsworks...")
-    project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
+    # ✅ FIXED: Added host parameter
+    project = hopsworks.login(
+        api_key_value=HOPSWORKS_API_KEY,
+        project=HOPSWORKS_PROJECT,
+        host=HOPSWORKS_HOST
+    )
     fs = project.get_feature_store()
 
     fg = fs.get_or_create_feature_group(
@@ -168,11 +173,16 @@ def create_feature_group(df, feature_group_name=FEATURE_GROUP_NAME):
 
 
 # ============================================================
-#  STEP 3 — TRAIN AND REGISTER MODEL
+#  STEP 3 – TRAIN AND REGISTER MODEL
 # ============================================================
 def wait_for_materialization(job_name="aqi_features_1_offline_fg_materialization", timeout=300):
     try:
-        project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
+        # ✅ FIXED: Added host parameter
+        project = hopsworks.login(
+            api_key_value=HOPSWORKS_API_KEY,
+            project=HOPSWORKS_PROJECT,
+            host=HOPSWORKS_HOST
+        )
         job = project.get_jobs().get_job(job_name)
         if job:
             logger.info("Waiting for materialization job %s...", job_name)
@@ -188,7 +198,12 @@ def train_and_register_model(df):
         raise ValueError("Empty dataframe passed to training.")
 
     wait_for_materialization()
-    project = hopsworks.login(     api_key_value=HOPSWORKS_API_KEY,     project=HOPSWORKS_PROJECT,     host=HOPSWORKS_HOST )
+    # ✅ FIXED: Added host parameter
+    project = hopsworks.login(
+        api_key_value=HOPSWORKS_API_KEY,
+        project=HOPSWORKS_PROJECT,
+        host=HOPSWORKS_HOST
+    )
     mr = project.get_model_registry()
     df = df.dropna()
 
@@ -290,14 +305,12 @@ def main():
         create_feature_group(df)
         df_features = create_feature_group(combined)
         train_and_register_model(df_features)
-
         logger.info("Run-once complete.")
         return
-    # ============================================================
-#  STEP 4 — STREAMLIT DASHBOARD (with 3-day forecasting)
+
+
 # ============================================================
-# ============================================================
-#  STEP 4 — STREAMLIT DASHBOARD
+#  STEP 4 – STREAMLIT DASHBOARD
 # ============================================================
 def run_dashboard(model, df):
     if st is None:
@@ -330,9 +343,8 @@ def run_dashboard(model, df):
 
     st.line_chart(result_df)
     if len(preds):
-        st.metric("🌤 Latest AQI Prediction", round(float(preds[-1]), 2))
+        st.metric("🌤️ Latest AQI Prediction", round(float(preds[-1]), 2))
     st.write("Data Source: Open-Meteo | Model: Random Forest | Feature Store: Hopsworks")
-
 
 
 if __name__ == "__main__":
