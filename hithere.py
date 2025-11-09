@@ -29,7 +29,12 @@ logger = logging.getLogger("aqi")
 # ---------- CONFIG ----------
 HOPSWORKS_API_KEY = os.getenv("HOPSWORKS_API_KEY")
 HOPSWORKS_PROJECT = os.getenv("HOPSWORKS_PROJECT", "aqipredictionn")
-HOPSWORKS_HOST = os.getenv("HOPSWORKS_HOST", "c.app.hopsworks.ai")  # ✅ ADD DEFAULT HOST
+HOPSWORKS_HOST = os.getenv("HOPSWORKS_HOST", "c.app.hopsworks.ai")
+
+# ✅ Debug logging
+logger.info("Config - API Key: %s", "***" if HOPSWORKS_API_KEY else "NOT SET")
+logger.info("Config - Project: %s", HOPSWORKS_PROJECT)
+logger.info("Config - Host: %s", HOPSWORKS_HOST)
 FEATURE_GROUP_NAME = "aqi_features"
 FEATURE_GROUP_VERSION = 1
 MODEL_DIR = "./model"
