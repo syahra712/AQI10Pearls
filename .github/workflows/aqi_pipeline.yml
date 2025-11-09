@@ -41,7 +41,7 @@ jobs:
           python3 hithere.py --mode fetch --hours 24
 
       - name: 📤 Upload Updated CSV
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: features-csv
           path: features_latest.csv
@@ -86,7 +86,7 @@ jobs:
           python3 hithere.py --mode train
 
       - name: 📤 Upload Trained Model
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rf-model
           path: model/rf_model.pkl
