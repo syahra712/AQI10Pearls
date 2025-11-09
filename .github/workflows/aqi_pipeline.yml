@@ -8,7 +8,6 @@ on:
 
 env:
   PYTHONPATH: .
-  HOPSWORKS_HOST: c.app.hopsworks.ai
 
 jobs:
   # =====================================================
@@ -36,7 +35,7 @@ jobs:
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
-          HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
+          HOPSWORKS_HOST: c.app.hopsworks.ai
         run: |
           python3 hithere.py --mode fetch --hours 24
 
@@ -81,7 +80,7 @@ jobs:
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
           HOPSWORKS_PROJECT: ${{ secrets.HOPSWORKS_PROJECT }}
-          HOPSWORKS_HOST: ${{ secrets.HOPSWORKS_HOST }}
+          HOPSWORKS_HOST: c.app.hopsworks.ai
         run: |
           python3 hithere.py --mode train
 
